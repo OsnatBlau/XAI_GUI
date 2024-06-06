@@ -1,0 +1,8 @@
+[['boxer', 'kuvasz'], dogs]
+[['pug', 'boxer', 'kuvasz'], dogs]
+[['Norwich_terrier', 'chimpanzee', 'gorilla', 'spider_monkey', 'Madagascar_cat', 'lynx', 'Persian_cat', 'tabby', 'pug', 'boxer', 'kuvasz'], entity]
+[['Norwich_terrier', 'chimpanzee', 'gorilla', 'spider_monkey', 'Madagascar_cat', 'lynx', 'Persian_cat', 'tabby', 'pug', 'boxer', 'kuvasz', 'Crock_Pot', 'wok', 'frying_pan', 'caldron', 'teapot', 'coffeepot', 'broccoli', 'head_cabbage', 'orange', 'Granny_Smith', 'zucchini', 'cauliflower', 'lemon', 'fig', 'white_stork', 'flamingo', 'American_coot', 'black_swan'], entity]
+[['warplane', 'airliner', 'space_shuttle', 'minivan', 'police_van', 'cab', 'limousine', 'jeep', 'container_ship', 'fireboat', 'catamaran', 'trimaran', 'Norwich_terrier', 'chimpanzee', 'gorilla', 'spider_monkey', 'Madagascar_cat', 'lynx', 'Persian_cat', 'tabby', 'pug', 'boxer', 'kuvasz', 'Crock_Pot', 'wok', 'frying_pan', 'caldron', 'teapot', 'coffeepot', 'broccoli', 'head_cabbage', 'orange', 'Granny_Smith', 'zucchini', 'cauliflower', 'lemon', 'fig', 'white_stork', 'flamingo', 'American_coot', 'black_swan'], entity]
+[['Persian_cat', 'tabby'], cats]
+[['Persian_cat', 'tabby', 'pug', 'boxer', 'kuvasz'], animals]
+[['chimpanzee', 'gorilla', 'spider_monkey', 'Madagascar_cat', 'lynx', 'Persian_cat', 'tabby', 'pug', 'boxer', 'kuvasz'], animals]

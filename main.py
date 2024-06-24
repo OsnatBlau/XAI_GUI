@@ -440,7 +440,6 @@ class XAIQuery(QMainWindow):
             if category is None:
                 QMessageBox.warning(self, "Error", "The selected image category does not exist in the hierarchical data.")
             else:
-                # display_text = self.show_connections(category, graph)
                 graph_res_page = TheGraphRes(category, graph, blackBox) # display_text
                 widget.addWidget(graph_res_page)
                 widget.setCurrentIndex(widget.currentIndex() + 1)
@@ -554,85 +553,6 @@ class XAIQuery(QMainWindow):
     def back_function(self):
         global widget
         widget.setCurrentIndex(0)
-
-    def show_connections(self, blackBox, category, graph):
-        # Load the user_common_group.txt file
-        with open('./user_common_group.txt', 'r') as file:
-            file_content = file.readlines()
-
-        # Select paths using the hierarchical data map
-        hierarchical_data_map = {
-            'ResNet': ResNet_hierarchical_data,
-            'VGG': VGG_hierarchical_data,
-            'GoogLeNet': GoogLeNet_hierarchical_data,
-            'EfficientNet': EfficientNet_hierarchical_data
-        }
-
-        if blackBox in hierarchical_data_map:
-            data = hierarchical_data_map[blackBox]
-            paths = data.get(graph, [])
-        else:
-            raise ValueError(f"Unknown blackBox named {blackBox}")
-        
-        if paths:
-            formatted_paths = []
-            for path in paths:
-                if category in path:
-                    flag = 0
-                    for line in file_content:
-                        try:
-                            # Strip whitespace and split the line into the list and group name
-                            line = line.strip()
-                            if line.startswith("[") and "], " in line:
-                                list_part, group_name_part = line.split("], ", 1)
-                                list_part += "]]"  # Add the closing bracket back to the list part
-                                user_path = ast.literal_eval(list_part)
-                                group_name = group_name_part.strip().replace(']', '')
-                                if np.array_equal(path, user_path[0]):
-                                    flag = 1
-                                    highlighted_path = ['<span style="color: red; font-size: 20px;"><b>{}</b></span>'.format(item) if item == category else item for item in path]
-                                    formatted_string = f"A {category} is a part of the concept '{group_name}': ['{', '.join(highlighted_path)}'].<br><br>"
-                                    formatted_paths.append(formatted_string)
-                                    break  # Stop searching after finding a match
-                        except (ValueError, SyntaxError) as e:
-                            print(f"Error parsing line: {line}. Error: {e}")
-                            continue  # Ignore lines that can't be parsed
-
-                    if flag == 0:
-                        highlighted_path = ['<span style="color: red; font-size: 20px;"><b>{}</b></span>'.format(item) if item == category else item for item in path]
-                        formatted_string = f"A {category} is a part of the concept '{self.common_group(path)}': ['{', '.join(highlighted_path)}'].<br><br>"
-                        formatted_paths.append(formatted_string)
-            return "\n".join(formatted_paths)
-        else:
-            return f"No data available for model {blackBox} or for graph type '{graph}'."
-        
-    def common_group(self, groups):
-        common_hypernyms = []
-        hierarchy = {}
-        
-        # Get the synsets for each input name
-        for group in groups:
-            
-            # Initialize an empty list for each category folder key
-            hierarchy[group] = []
-            
-            # Extract hypernyms for each category
-            synsets = wn.synsets(group)
-            if synsets:
-                hypernyms = synsets[0].hypernym_paths()
-                for path in hypernyms:
-                    hierarchy[group].extend([node.name().split('.')[0] for node in path])
-                    
-        # Check common hypernyms
-        if len(hierarchy) == 1:
-            common_hypernyms = list(hierarchy.values())[0]
-        else:
-            for group in groups:
-                for hypernym in hierarchy[group]:
-                    if all(hypernym in hypernyms for hypernyms in hierarchy.values()):
-                        common_hypernyms.append(hypernym)
-        
-        return next(iter(common_hypernyms[::-1]), "No common hypernym found")
 
 class TheGraphRes(QMainWindow):
     def __init__(self, category, graph, blackBox):
@@ -784,14 +704,9 @@ class TheGraphRes(QMainWindow):
             formatted_paths = []
             for path in paths:
                 if self.category in path:
-                    # Add the connection label to the layout
-                    connection_label = QLabel(f"A {self.category} is a part of the concept <b>'{self.common_group(path)}'<b>: [")
-                    connection_label.setTextFormat(Qt.TextFormat.RichText)
-                    vbox.addWidget(connection_label)
-
+                    flag = 0
                     hbox = QHBoxLayout()
                     count = 0
-                    flag = 0
                     for line in file_content:
                         try:
                             # Strip whitespace and split the line into the list and group name
@@ -800,9 +715,14 @@ class TheGraphRes(QMainWindow):
                                 list_part, group_name_part = line.split("], ", 1)
                                 list_part += "]]"  # Add the closing bracket back to the list part
                                 user_path = ast.literal_eval(list_part)
-                                group_name = group_name_part.strip().replace(']', '')
                                 if np.array_equal(path, user_path[0]):
                                     flag = 1
+                                    group_name = group_name_part.strip().replace(']', '')
+                                    # Add the connection label to the layout
+                                    connection_label = QLabel(f"A {self.category} is a part of the concept <b>'{group_name}'<b>: [")
+                                    connection_label.setTextFormat(Qt.TextFormat.RichText)
+                                    vbox.addWidget(connection_label)
+                    
                                     for item in path:
                                         if item in self.image_dict:
                                             if count > 15:
@@ -835,6 +755,10 @@ class TheGraphRes(QMainWindow):
                             continue  # Ignore lines that can't be parsed
 
                     if flag == 0:
+                        # Add the connection label to the layout
+                        connection_label = QLabel(f"A {self.category} is a part of the concept <b>'{self.common_group(path)}'<b>: [")
+                        connection_label.setTextFormat(Qt.TextFormat.RichText)
+                        vbox.addWidget(connection_label)
                         for item in path:
                             if item in self.image_dict:
                                 if count > 15:
